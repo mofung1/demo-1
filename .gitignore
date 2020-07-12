@@ -1,2 +1,4 @@
 .idea
 data
+docker/docker-compose.example.yml
+docker/config.example
