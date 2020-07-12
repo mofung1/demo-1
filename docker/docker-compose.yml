@@ -1,0 +1,62 @@
+version: '3'
+
+networks:
+  tp6:
+    driver: bridge
+
+services:
+
+  nginx:
+    container_name: tp6-nginx
+    image: nginx:1.17.0
+    depends_on:
+      - "php"
+    volumes:
+      - ../server/public:/server/public
+      - ./config/nginx/conf.d:/etc/nginx/conf.d
+      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../data/nginx/logs:/logs
+    networks:
+      - tp6
+    ports:
+      - "11115:80"
+
+  php:
+    container_name: tp6-php
+    image: indexlin/likecms-php7.4:1.0
+    working_dir: /server
+    volumes:
+      - ../server:/server
+      - ./config/php/php.ini:/usr/local/etc/php/conf.d/php.ini
+      #- ./php/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    networks:
+      - tp6
+    ports:
+      - "13115:9000"
+    #user: "1000:1000"
+
+
+  mysql:
+    container_name: tp6-mysql
+    image: mysql:5.7.29
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ../data/mysql/lib:/var/lib/mysql
+      #- ../data/mysql/log:/var/log/mysql
+      - ./config/mysql/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
+    networks:
+      - tp6
+    ports:
+      - "15115:3306"
+
+  redis:
+    container_name: tp6-redis
+    image: redis:5.0.5
+    volumes:
+      - ../data/redis:/data
+      - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - tp6
+    ports:
+      - "17115:6379"
