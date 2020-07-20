@@ -7,7 +7,6 @@ class Index extends BaseController
 {
     public function index()
     {
-        dd(phpinfo());
         return json('132');
     }
 
